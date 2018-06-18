@@ -1,0 +1,2 @@
+[15-Jun-2016 07:03:09 UTC] PHP Fatal error:  Call to undefined function prin_r() in /usr/local/cpanel/whostmgr/docroot/cgi/cpnginx/ajax/set.php on line 10
+[15-Jun-2016 07:07:34 UTC] PHP Parse error:  syntax error, unexpected 'i' (T_STRING), expecting ',' or ';' in /usr/local/cpanel/whostmgr/docroot/cgi/cpnginx/ajax/set.php on line 14

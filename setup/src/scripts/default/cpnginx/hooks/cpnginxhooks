@@ -1,0 +1,67 @@
+#!/usr/bin/python -B
+import os
+import sys
+import subprocess
+import shutil
+def setperm():
+    hooks=['adduser.py','adom.py','cpnginxuapi.py','parkdomain.py','postupcp.py','rmaddon.py','rmparkdomain.py','rmsubdomain.py','rmuser.py','rmvhost.py','subdom.py','ssldom.py','rmssldom.py']
+    for script in hooks:
+        fscript="/usr/local/cpanel/scripts/cpnginx/hooks/"+script
+        os.chmod(fscript,0750)
+        print "Giving execute permission for hook script .. " + fscript
+    shutil.copy('/usr/local/cpanel/scripts/cpnginx/hooks/Cpnginx.pm','/usr/local/cpanel/Cpanel/API/')
+    os.chmod('/usr/local/cpanel/Cpanel/API/Cpnginx.pm',0644)
+def install():
+    setperm()
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/adduser.py --category=Whostmgr --event=Accounts::Create --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/rmuser.py --category=Whostmgr --event=Accounts::Remove --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/adom.py --category=Cpanel --event=Api2::AddonDomain::addaddondomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/rmaddon.py --category=Cpanel --event=Api2::AddonDomain::deladdondomain --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/subdom.py --category=Cpanel --event=Api2::SubDomain::addsubdomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/rmsubdomain.py --category=Cpanel --event=Api2::SubDomain::delsubdomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/parkdomain.py --category=Cpanel --event=Api2::Park::park --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/rmparkdomain.py --category=Cpanel --event=Api2::Park::unpark --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/cpnginxuapi.py --category=Cpanel --event=UAPI::Cpnginx::rebuildvhost --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/postupcp.py --category=System --event=upcp --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/ssldom.py --category=Cpanel --event=UAPI::SSL::install_ssl --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks add script /usr/local/cpanel/scripts/cpnginx/hooks/rmssldom.py --category=Cpanel --event=UAPI::SSL::delete_ssl --escalateprivs=1 --stage=post --manual'],shell=True)
+
+
+
+
+def remove():
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/adduser.py --category=Whostmgr --event=Accounts::Create --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/rmuser.py --category=Whostmgr --event=Accounts::Remove --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/adom.py --category=Cpanel --event=Api2::AddonDomain::addaddondomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/rmaddon.py --category=Cpanel --event=Api2::AddonDomain::deladdondomain --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/subdom.py --category=Cpanel --event=Api2::SubDomain::addsubdomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/rmsubdomain.py --category=Cpanel --event=Api2::SubDomain::delsubdomain --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/parkdomain.py --category=Cpanel --event=Api2::Park::park --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/rmparkdomain.py --category=Cpanel --event=Api2::Park::unpark --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/cpnginxuapi.py --category=Cpanel --event=UAPI::Cpnginx::rebuildvhost --escalateprivs=1 --stage=pre --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/postupcp.py --category=System --event=upcp --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/ssldom.py --category=Cpanel --event=UAPI::SSL::install_ssl --escalateprivs=1 --stage=post --manual'],shell=True)
+    subprocess.call(['/usr/local/cpanel/bin/manage_hooks delete script /usr/local/cpanel/scripts/cpnginx/hooks/rmssldom.py --category=Cpanel --event=UAPI::SSL::delete_ssl --escalateprivs=1 --stage=post --manual'],shell=True)
+    os.remove('/usr/local/cpanel/Cpanel/API/Cpnginx.pm')
+
+
+
+
+
+if __name__ == "__main__":
+    if  os.geteuid()==0:
+        if len(sys.argv) == 2:
+            if 'install' == sys.argv[1]:
+                install()
+            elif 'remove' == sys.argv[1]:
+                remove()
+            else:
+                print "Unknown command"
+                sys.exit(2)
+                sys.exit(0)
+        else:
+            print "Cpnginx Hook Manager usage: %s install|remove" % sys.argv[0]
+            sys.exit(2)
+    else:
+        print "Cpnginx Hook Manager"
+        sys.exit(2)

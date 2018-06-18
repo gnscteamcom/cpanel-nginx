@@ -1,0 +1,1 @@
+The cpanel UAPI  module Cpnginx.pm  will be copied to /usr/local/cpanel/Cpanel/API/Cpnginx.pm   . This module is for sending a rebuildvhost request for the hook script cpnginxuapi.py from the cpanel plugin page. This module only works if the cpnginx plugin is enabled in the whm feature manager

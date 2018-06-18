@@ -1,0 +1,73 @@
+#!/usr/bin/python -B
+import sys, time
+from monitor  import Monitor
+import subprocess
+from shellcolor import shellcolor
+import logging
+import logging.handlers
+import os
+import stat
+import dataparse
+import core
+import re
+class NginxMonitor(Monitor):
+    def run(self):
+        LOG_FILENAME = "/var/log/nginxmonitor.log"
+        LOG_LEVEL = logging.INFO
+        logger = logging.getLogger("cpnginx")
+        logger.setLevel(LOG_LEVEL)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler = logging.FileHandler(LOG_FILENAME)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        class NLogger(object):
+            def __init__(self, logger, level):
+                self.logger = logger
+                self.level = level
+            def write(self, message):
+                if message.rstrip() != "":
+                    self.logger.log(self.level, message.rstrip())
+        sys.stdout = NLogger(logger, logging.INFO)
+        sys.stderr = NLogger(logger, logging.ERROR)
+
+        while True:
+            taskfile="/var/run/cpnginx.task"
+            if not os.path.exists(taskfile):
+                print "Cpnginx monitor started "
+                with open(taskfile, 'w') as handle:
+                    handle.write("")
+                os.chmod(taskfile,0666)
+            else:
+                taskperm=oct(stat.S_IMODE(os.lstat(taskfile).st_mode))
+                if not taskperm == 0666:
+                    os.chmod(taskfile,0666)
+                data=dataparse.readjson(taskfile)
+                if not  len(data.keys()) == 0:
+                    for domain in data:
+                        if re.search("^[\.A-Za-z0-9_-]*$", domain):
+                            core.rebuildvhost(domain)
+                        else:
+                            print >>sys.stderr, "Unknown domain name format " +shellcolor.fail + domain + shellcolor.end
+                with open(taskfile, 'w'): pass
+            time.sleep(3)
+
+if __name__ == "__main__":
+    if  os.geteuid()==0:
+        monitor = NginxMonitor('/var/run/cpnginx.pid')
+        if len(sys.argv) == 2:
+            if 'start' == sys.argv[1]:
+                monitor.start()
+            elif 'stop' == sys.argv[1]:
+                monitor.stop()
+            elif 'restart' == sys.argv[1]:
+                monitor.restart()
+            else:
+                print "Unknown command"
+                sys.exit(2)
+                sys.exit(0)
+        else:
+            print "usage: %s start|stop|restart" % sys.argv[0]
+            sys.exit(2)
+    else:
+        print "Cpnginx Task Monitor"
+        sys.exit(2)

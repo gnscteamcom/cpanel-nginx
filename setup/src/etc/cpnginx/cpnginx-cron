@@ -1,0 +1,3 @@
+# For monitoring ssl certificate changes , becuase whm don't have ssl hooks till now
+SHELL=/bin/sh
+0 * * * * root /usr/local/cpanel/scripts/cpnginx/autosslmonitor.py  > /dev/null 2>&1
